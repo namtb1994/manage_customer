@@ -90,7 +90,7 @@ function getOptionStatusArr() {
 
 function getOptionStatusDefault() {
 
-    return getOptionStatusArr()[0];
+    return 0;
 }
 
 function addCustomerFields() {
@@ -128,7 +128,7 @@ add_action( 'save_post', function( $post_id ) {
     if ( isset( $_POST['customer_id'] ) ) {
         update_post_meta( $post_id, 'customer_id', $_POST['customer_id'] );
     }
-} );
+});
 
 function customer_phone_callback( $post ) {
     $value = get_post_meta( $post->ID, 'customer_phone', true );
@@ -281,7 +281,7 @@ function manageCustomer_importCustomer() {
 			];
 			$customerId = wp_insert_post($customerData);
 	        update_post_meta( $customerId, 'customer_phone', $row['phone'] );
-	        update_post_meta( $customerId, 'customer_status', 0 );
+	        update_post_meta( $customerId, 'customer_status', getOptionStatusDefault() );
 		}
     } else {
     	$result['status'] = 'error';

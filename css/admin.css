@@ -1,0 +1,117 @@
+.manage-customer input[type="text"],
+.manage-customer input[type="number"] {
+  width: 100%;
+  max-width: 500px;
+}
+.manage-customer select {
+  width: 100%;
+  max-width: 500px;
+}
+.manage-customer select[multiple] {
+  height: 200px;
+  overflow: auto;
+}
+.manage-customer textarea {
+  width: 100%;
+  height: 200px;
+}
+.manage-customer .field {
+  margin-bottom: 15px;
+}
+.manage-customer button {
+  color: #fff;
+  background-color: #232323;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.manage-customer button[data-action="clear"]:not(.show) {
+  display: none;
+}
+.manage-customer .filter {
+  margin: 0;
+}
+.manage-customer .message {
+  display: none;
+}
+.manage-customer .message.error {
+  display: block;
+  padding: 10px;
+  margin: 20px 0 0 0;
+}
+.manage-customer .message.updated {
+  display: block;
+  padding: 10px;
+  margin: 20px 0 0 0;
+}
+.manage-customer .insert-xml-post {
+  opacity: 0;
+  visibility: hidden;
+}
+.manage-customer .insert-xml-post.active {
+  opacity: 1;
+  visibility: visible;
+}
+.manage-customer .box-loading.loading,
+.manage-customer .loading > .box-loading {
+  background: url(../img/ajax_spinner.svg);
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-repeat: no-repeat;
+  background-position: center;
+  z-index: 99;
+}
+.manage-customer .container {
+  padding: 0 15px;
+  width: 100%;
+}
+.manage-customer .row {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -15px;
+}
+.manage-customer .row .col-6 {
+  box-sizing: border-box;
+  width: 50%;
+  padding: 0 15px;
+}
+.manage-customer .row .col-2 {
+  box-sizing: border-box;
+  width: 16.6666%;
+  padding: 0 15px;
+}
+.manage-customer .row .col-3 {
+  box-sizing: border-box;
+  width: 25%;
+  padding: 0 15px;
+}
+.manage-customer .row .col-4 {
+  box-sizing: border-box;
+  width: 33.3333%;
+  padding: 0 15px;
+}
+.manage-customer .row .col-8 {
+  box-sizing: border-box;
+  width: 66.6666%;
+  padding: 0 15px;
+}
+.manage-customer .row .col-12 {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0 15px;
+}
+.manage-customer table .items {
+  max-width: 100%;
+  text-align: left;
+  margin-top: 30px;
+}
+.manage-customer table th {
+  padding: 5px 10px;
+}
+.manage-customer table td {
+  padding: 5px 10px;
+}

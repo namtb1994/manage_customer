@@ -182,9 +182,9 @@ function manageCustomer_backendOptions() {
 			<div class="message"></div>
 			<?php if (current_user_can( 'administrator' )): ?>
 				<div class="import-section">
-					<h1><?= esc_html( __( 'Import customer by file csv' ) ); ?></h1>
+					<h1><?= esc_html( __( 'Import customer by file xls' ) ); ?></h1>
 					<form style="display: flex;" class="form-import">
-						<input id="list_customer_csv" type="file" name="list_customer_csv">
+						<input id="list_customer_xls" type="file" name="list_customer_xls">
 						<button type="submit" class="run"><?= __('Run') ?></button>
 					</form>
 					<div id="ExcelTable"></div>
@@ -225,8 +225,8 @@ function manageCustomer_backendOptions() {
 					};
 			 	    jQuery('.import-section .form-import').on('submit', function(e) {
 			 	    	e.preventDefault();
-			        	const csvFile = document.getElementById("list_customer_csv");
-			        	const input = csvFile.files[0];
+			        	const xlsFile = document.getElementById("list_customer_xls");
+			        	const input = xlsFile.files[0];
 			        	if (input) {
 			        		var xl2json = new ExcelToJSON();
 		        		    xl2json.parseExcel(input);
@@ -237,7 +237,6 @@ function manageCustomer_backendOptions() {
 			<?php endif ?>
 			<div class="manage-section">
 				<h1><?= esc_html( __( 'Manage Customer' ) ); ?></h1>
-				<button type="button" class="export" style="display: none;"><?= __('Export To CSV') ?></button>
 				<?php manageCustomer_list() ?>
 				<div class="modal" id="orderNote" role="dialog">
 					<div class="modal-dialog">

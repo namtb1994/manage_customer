@@ -477,13 +477,16 @@ function manageCustomer_list() {
 			</div>
 		</div>
 		<div class="col-12">
-			<div class="pagination" style="display: none;">
+			<div class="pagination">
 				<div style="display: flex;">
 					<span><?= __("page") ?></span>
 					<input min="1" style="width: 100px; text-align: center;" type="number" name="current-page" value="1">
 					<span><?= __("of") ?></span>
 					<span class="max-page">1</span>
 					<span><?= __("page(s)") ?></span>
+					<span></span>
+					<span><?= __("Total number of items: ") ?></span>
+					<span class="total-items">0</span>
 				</div>
 			</div>
 		</div>
@@ -530,7 +533,6 @@ function manageCustomer_list() {
 		var submitSearch = container.find('button.submit_search');
 		var pagination = container.find('.pagination');
 		var dataActionDefault = 'load_more';
-		var maxPage = 0;
 		var data = {
 			'action' : dataActionDefault,
 			'categories' : listCategoriesDefault,
@@ -560,14 +562,11 @@ function manageCustomer_list() {
 	        submitSearch.prop('disabled', true);
 	        jQuery.post( urlAdminAjax, request, function( json ) {
 				if (json.success) {
-					maxPage = json.data.max_num_pages;
-					if (maxPage > 1) {
-						pagination.show();
-					} else {
-						pagination.hide();
-					}
+					var maxPage = json.data.max_num_pages;
+					var totalItems = json.data.count;
 					pagination.find('[name="current-page"]').attr('max', maxPage);
 					pagination.find('.max-page').html(maxPage);
+					pagination.find('.total-items').html(totalItems);
 					if (json.data.count) {
 						element.closest('table').find('thead').show();
 					} else {

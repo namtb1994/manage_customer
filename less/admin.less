@@ -133,11 +133,15 @@
 		}
 		th {
 			padding: 5px 10px;
-			border-left: 1px solid #ccc;
+			&:not(.no-border) {
+				border-left: 1px solid #ccc;
+			}
 		}
 		td {
 			padding: 5px 10px;
-			border-left: 1px solid #ccc;
+			&:not(.no-border) {
+				border-left: 1px solid #ccc;
+			}
 		}
 	}
 }

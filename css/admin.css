@@ -125,9 +125,13 @@
 }
 .manage-customer table th {
   padding: 5px 10px;
+}
+.manage-customer table th:not(.no-border) {
   border-left: 1px solid #ccc;
 }
 .manage-customer table td {
   padding: 5px 10px;
+}
+.manage-customer table td:not(.no-border) {
   border-left: 1px solid #ccc;
 }

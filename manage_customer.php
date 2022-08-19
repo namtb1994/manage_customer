@@ -493,7 +493,7 @@ function manageCustomer_list() {
 							<?php endif ?>
 						<?php endforeach ?>
 						<th><?= __('Actions') ?></th>
-						<th><?= __('') ?></th>
+						<th class="no-border"><?= __('') ?></th>
 					</tr>
 				</thead>
 				<tbody class="list-items items"></tbody>
@@ -509,7 +509,6 @@ function manageCustomer_list() {
 				<span><?= __("of") ?></span>
 				<span class="max-page">1</span>
 				<span><?= __("page(s)") ?></span>
-
 			</div>
 		</div>
 	</div>
@@ -862,7 +861,7 @@ function manageCustomer_getListPost() {
 				}
 			}
 			$html .= '<td><div><button data-toggle="modal" class="btn-order" type="button" data-target="#orderNote">'.__("Create Order").'</button></div></td>';
-			$html .= '<td><div><button style="display: none" class="btn-save" type="button">'.__("Save").'</button></div></td>';
+			$html .= '<td class="no-border"><div><button style="display: none" class="btn-save" type="button">'.__("Save").'</button></div></td>';
 			$html .= '</tr>';
 		endwhile;
 	} else {

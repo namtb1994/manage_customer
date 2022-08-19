@@ -18,9 +18,153 @@ function manageCustomer_enqueue_admin_scripts() {
 add_action( 'admin_enqueue_scripts', 'manageCustomer_enqueue_admin_scripts' );
 
 function manageCustomer_register_options_page() {
-	add_menu_page('Manage Customer', 'Manage Customer', 'read', 'manage_customer', 'manageCustomer_backendOptions', '', 4.0);
+	add_menu_page(
+		'Manage Customer',
+		'Manage Customer',
+		'read',
+		'manage_customer',
+		'manageCustomer_backendOptions',
+		'',
+		4.0
+	);
+	add_menu_page(
+		'Customer Status Setting',
+		'Customer Status Setting',
+		'administrator',
+		'customer_status_setting',
+		'manageCustomer_statusSetting',
+		'',
+		4.0
+	);
 }
 add_action('admin_menu', 'manageCustomer_register_options_page');
+
+function getOptionStatusArr() {
+	$options = get_option('list_options_customer_status');
+	if ($options !== false && $options != '') {
+
+		return json_decode($options);
+	}
+
+    return [
+    	'Pending',
+    	'option 1',
+    	'option 2'
+    ];
+}
+
+function manageCustomer_statusSetting() {
+?>
+	<?php if (current_user_can( 'administrator' )): ?>
+	<div class="manage-customer">
+		<div class="container">
+			<div class="box-loading">
+				<div class="progress"></div>
+			</div>
+			<div class="message"></div>
+			<div class="status-section">
+				<h1><?= esc_html( __( 'Customer status setting' ) ); ?></h1>
+				<form class="form-status-customer">
+					<ul class="items">
+						<li class="item">
+							<input type="text" name="status-0" value="<?= getOptionStatusArr()[0] ?>">
+							<button disabled type="button" class="default"><?= __('Item Default (only change text)') ?></button>
+						</li>
+						<?php $keyLast = 0; ?>
+						<?php foreach (getOptionStatusArr() as $key => $value): ?>
+							<?php if ($key > 0): ?>
+								<li class="item">
+									<input type="text" name="status-<?= $key ?>" value="<?= $value ?>">
+									<button type="button" class="btn-remove"><?= __('-') ?></button>
+								</li>
+							<?php endif ?>
+							<?php $keyLast = $key ?>
+						<?php endforeach ?>
+					</ul>
+					<button type="button" class="btn-add-more"><?= __('+') ?></button>
+					<button disabled type="submit" class="btn-save"><?= __('Save') ?></button>
+				</form>
+			</div>
+		 	<script type="text/javascript">
+		 		var keyLast = parseInt('<?= $keyLast ?>');
+		 		var btnSave = jQuery('.status-section .form-status-customer .btn-save');
+		 	    jQuery('.status-section .form-status-customer').on('submit', function(e) {
+		 	    	e.preventDefault();
+		 	    	btnSave.prop('disabled', true);
+		 	    	var thisForm = jQuery(this);
+		 	    	jQuery('.manage-customer div.box-loading').addClass( "loading" );
+		 	    	var formData = thisForm.serializeArray();
+		 	    	var url = '<?= admin_url( "admin-ajax.php" ) ?>';
+			        data = {
+	    		        'action': 'manageCustomer_saveListStatus',
+	    		        'data': formData
+			        };
+			        jQuery.post( url, data, function( json ) {
+						if (json.success) {
+							jQuery('.manage-customer .message').html(json.data.message);
+							jQuery('.manage-customer .message').addClass(json.data.status);
+							thisForm.find('.item').each(function() {
+								var valueItem = jQuery(this).find('input').val();
+								if (!valueItem) {
+									jQuery(this).remove();
+								}
+							});
+							jQuery('.manage-customer div.box-loading').removeClass( "loading" );
+						}
+		           	});
+		 	    });
+		 	    jQuery('.status-section .form-status-customer .item input').on('input', function() {
+		 	    	btnSave.prop('disabled', false);
+		 	    });
+		 	    jQuery(document).on('click', '.status-section .form-status-customer .btn-remove', function(e) {
+		 	    	e.preventDefault();
+		 	    	jQuery(this).closest('.item').remove();
+		 	    });
+		 	    jQuery('.status-section .form-status-customer .btn-add-more').click(function(e) {
+		 	    	e.preventDefault();
+		 	    	jQuery(this).prop('disabled', true);
+		 	    	keyLast++;
+		 	    	var new_item = '<li class="item">';
+		 	    	new_item += '<input type="text" name="status-'+keyLast+'">';
+		 	    	new_item += '<button type="button" class="btn-remove"><?= __('-') ?></button>';
+		 	    	new_item += '</li>';
+		 	    	jQuery('.form-status-customer .items').append(new_item);
+		 	    	jQuery(this).prop('disabled', false);
+		 	    	btnSave.prop('disabled', false);
+		 	    });
+		 	</script>
+	 	</div>
+	</div>
+	<?php endif ?>
+<?php
+}
+
+function manageCustomer_saveListStatus() {
+	$result = [
+		"status" => 'error',
+		"message" => __('Have Error! Please try again')
+	];
+	if ( isset($_REQUEST['data']) ) {
+		$options = [];
+		foreach ($_REQUEST['data'] as $item) {
+			if ($item['value']) {
+				$options[] = $item['value'];
+			}
+		}
+		$getOptions = get_option('list_options_customer_status');
+		if ($getOptions !== false) {
+			update_option( 'list_options_customer_status', json_encode($options), '', 'yes' );
+		} else {
+			add_option( 'list_options_customer_status', json_encode($options), '', 'yes' );
+		}
+		$result["status"] = 'updated';
+		$result["message"] = __('Save Info Success');
+
+    }
+	wp_send_json_success($result);
+}
+add_action('wp_ajax_manageCustomer_saveListStatus', 'manageCustomer_saveListStatus');
+add_action('wp_ajax_nopriv_manageCustomer_saveListStatus', 'manageCustomer_saveListStatus');
 
 function loginRedirect( $redirect_to, $request, $user ){
     return "/wp-admin/admin.php?page=manage_customer";
@@ -78,15 +222,6 @@ function createOrderPostType() {
 	);
 }
 add_action( 'init', 'createOrderPostType' );
-
-function getOptionStatusArr() {
-    return $options = [
-    	'Pending',
-    	'option 1',
-    	'option 2',
-    	'option 3',
-    ];
-}
 
 function getOptionStatusDefault() {
 
@@ -187,7 +322,6 @@ function manageCustomer_backendOptions() {
 						<input id="list_customer_xls" type="file" name="list_customer_xls">
 						<button type="submit" class="run"><?= __('Run') ?></button>
 					</form>
-					<div id="ExcelTable"></div>
 				</div>
 			 	<script type="text/javascript">
 			 		var ExcelToJSON = function() {

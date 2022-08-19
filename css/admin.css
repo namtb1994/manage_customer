@@ -1,3 +1,9 @@
+.manage-customer .form-status-customer .items .item {
+  display: flex;
+}
+.manage-customer .form-status-customer .items .item button {
+  margin-left: 5px;
+}
 .manage-customer input[type="text"],
 .manage-customer input[type="number"] {
   width: 100%;
@@ -26,8 +32,8 @@
   border-radius: 3px;
   cursor: pointer;
 }
-.manage-customer button[data-action="clear"]:not(.show) {
-  display: none;
+.manage-customer button:disabled {
+  opacity: 0.7;
 }
 .manage-customer .filter {
   margin: 0;

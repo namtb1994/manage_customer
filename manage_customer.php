@@ -12,7 +12,7 @@ function manageCustomer_enqueue_admin_scripts() {
     wp_enqueue_style('bootstrap-admin-style');
 
     wp_enqueue_script( 'bootstrap', '/wp-content/plugins/manage_customer/js/bootstrap.min.js', array('jquery'), null, true );
-    wp_enqueue_script( 'xlsx', '/wp-content/plugins/manage_customer/js/xlsx.js', array('jquery'), null, true );
+    wp_enqueue_script( 'xlsx', '/wp-content/plugins/manage_customer/js/xlsx.min.js', array('jquery'), null, true );
 }
 add_action( 'admin_enqueue_scripts', 'manageCustomer_enqueue_admin_scripts' );
 
@@ -492,6 +492,9 @@ function manageCustomer_list() {
 				<thead style="display: none;">
 					<tr>
 						<th><?= __('#') ?></th>
+						<?php if (current_user_can( 'administrator' )): ?>
+							<th><?= __('Staff') ?></th>
+						<?php endif ?>
 						<th><?= __('Name') ?></th>
 						<th><?= __('Phone Number') ?></th>
 						<th><?= __('Address') ?></th>
@@ -533,7 +536,7 @@ function manageCustomer_list() {
 			'categories' : listCategoriesDefault,
 			'posts_per_page' : <?= $numberPostPerPage ?>,
 			'page_load' : 1,
-			'orderby' : 'title',
+			'orderby' : 'id',
 			'order' : 'ASC',
 			'total_rest' : null,
 			'key_word' : inputKeyWord.val(),
@@ -851,6 +854,9 @@ function manageCustomer_getListPost() {
 			$postId = get_the_ID();
 			$html .= '<tr class="item" data-id="'.$postId.'">';
 			$html .= '<td><div>'.$postId.'</div></td>';
+			if (current_user_can( 'administrator' )) {
+				$html .= '<td><div class="name">'.get_the_author().'</div></td>';
+			}
 			$html .= '<td><div class="name">'.get_the_title().'</div></td>';
 			$html .= '<td><div class="phone">'.get_post_meta($postId, 'customer_phone', true).'</div></td>';
 			$html .= '<td><div class="address">'.get_the_content().'</div></td>';

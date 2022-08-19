@@ -119,6 +119,7 @@ function manageCustomer_statusSetting() {
 		 	    jQuery(document).on('click', '.status-section .form-status-customer .btn-remove', function(e) {
 		 	    	e.preventDefault();
 		 	    	jQuery(this).closest('.item').remove();
+		 	    	btnSave.prop('disabled', false);
 		 	    });
 		 	    jQuery('.status-section .form-status-customer .btn-add-more').click(function(e) {
 		 	    	e.preventDefault();

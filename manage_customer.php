@@ -12,7 +12,6 @@ function manageCustomer_enqueue_admin_scripts() {
     wp_enqueue_style('bootstrap-admin-style');
 
     wp_enqueue_script( 'bootstrap', '/wp-content/plugins/manage_customer/js/bootstrap.min.js', array('jquery'), null, true );
-    wp_enqueue_script( 'jszip', '/wp-content/plugins/manage_customer/js/jszip.js', array('jquery'), null, true );
     wp_enqueue_script( 'xlsx', '/wp-content/plugins/manage_customer/js/xlsx.js', array('jquery'), null, true );
 }
 add_action( 'admin_enqueue_scripts', 'manageCustomer_enqueue_admin_scripts' );
@@ -340,7 +339,6 @@ function manageCustomer_backendOptions() {
 									type: 'binary'
 								});
 								workbook.SheetNames.forEach(function(sheetName) {
-									// Here is your object
 									var XL_row_object = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
 									var json_object = JSON.stringify(XL_row_object);
 									var url = '<?= admin_url( "admin-ajax.php" ) ?>';
@@ -478,7 +476,18 @@ function manageCustomer_list() {
 				</div>
 			</div>
 		</div>
-		<div style="margin-top: 30px;" class="content col-12">
+		<div class="col-12">
+			<div class="pagination" style="display: none;">
+				<div style="display: flex;">
+					<span><?= __("page") ?></span>
+					<input min="1" style="width: 100px; text-align: center;" type="number" name="current-page" value="1">
+					<span><?= __("of") ?></span>
+					<span class="max-page">1</span>
+					<span><?= __("page(s)") ?></span>
+				</div>
+			</div>
+		</div>
+		<div class="content col-12">
 			<table>
 				<thead style="display: none;">
 					<tr>
@@ -501,15 +510,6 @@ function manageCustomer_list() {
 		</div>
 		<div class="actions col-12">
 			<button style="display: none;" type="button" class="load-more"><?= __('Load More') ?> <span class="count"></span></button>
-		</div>
-		<div class="pagination" style="display: none;">
-			<div style="display: flex;">
-				<span><?= __("page") ?></span>
-				<input min="1" style="width: 100px; text-align: center;" type="number" name="current-page" value="1">
-				<span><?= __("of") ?></span>
-				<span class="max-page">1</span>
-				<span><?= __("page(s)") ?></span>
-			</div>
 		</div>
 	</div>
 	<script type="text/javascript">

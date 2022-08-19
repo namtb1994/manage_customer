@@ -502,6 +502,16 @@ function manageCustomer_list() {
 		<div class="actions col-12">
 			<button style="display: none;" type="button" class="load-more"><?= __('Load More') ?> <span class="count"></span></button>
 		</div>
+		<div class="pagination" style="display: none;">
+			<div style="display: flex;">
+				<span><?= __("page") ?></span>
+				<input min="1" style="width: 100px; text-align: center;" type="number" name="current-page" value="1">
+				<span><?= __("of") ?></span>
+				<span class="max-page">1</span>
+				<span><?= __("page(s)") ?></span>
+
+			</div>
+		</div>
 	</div>
 	<script type="text/javascript">
 		var urlAdminAjax = '<?= admin_url( "admin-ajax.php" ) ?>';
@@ -516,7 +526,9 @@ function manageCustomer_list() {
 		var customerStatus = container.find('[name="status"]');
 		var inputKeyWord = container.find('input[name="key_word"]');
 		var submitSearch = container.find('button.submit_search');
+		var pagination = container.find('.pagination');
 		var dataActionDefault = 'load_more';
+		var maxPage = 0;
 		var data = {
 			'action' : dataActionDefault,
 			'categories' : listCategoriesDefault,
@@ -542,9 +554,18 @@ function manageCustomer_list() {
 		        'data': data
 	        };
 	        buttonLoadMore.prop('disabled', true);
+	        pagination.find('[name="current-page"]').prop('disabled', true);
 	        submitSearch.prop('disabled', true);
 	        jQuery.post( urlAdminAjax, request, function( json ) {
 				if (json.success) {
+					maxPage = json.data.max_num_pages;
+					if (maxPage > 1) {
+						pagination.show();
+					} else {
+						pagination.hide();
+					}
+					pagination.find('[name="current-page"]').attr('max', maxPage);
+					pagination.find('.max-page').html(maxPage);
 					if (json.data.count) {
 						element.closest('table').find('thead').show();
 					} else {
@@ -560,7 +581,7 @@ function manageCustomer_list() {
 						data.page_load = parseInt(json.data.paged) + 1;
 						data.total_rest = parseInt(json.data.total_rest);
 						buttonLoadMore.find('.count').html('('+data.total_rest+')');
-						buttonLoadMore.show();
+						//buttonLoadMore.show();
 						buttonLoadMore.prop('disabled', false);
 						scrollEnable = true;
 					} else {
@@ -574,6 +595,7 @@ function manageCustomer_list() {
 						inputKeyWord.prop('disabled', false);
 					}
 					submitSearch.prop('disabled', false);
+					pagination.find('[name="current-page"]').prop('disabled', false);
 				}
            	});
 		}
@@ -583,6 +605,12 @@ function manageCustomer_list() {
 		});
 		buttonLoadMore.click(function(e) {
 	    	e.preventDefault();
+       		loadPosts(data, containerPosts);
+		});
+		pagination.find('[name="current-page"]').on('input', function(e) {
+	    	e.preventDefault();
+	    	data.action = 'filter';
+	    	data.page_load = jQuery(this).val();
        		loadPosts(data, containerPosts);
 		});
 		submitSearch.click(function(e) {

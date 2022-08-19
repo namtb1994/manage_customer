@@ -4,6 +4,11 @@
 .manage-customer .form-status-customer .items .item button {
   margin-left: 5px;
 }
+.manage-customer .pagination span {
+  margin: auto;
+  padding: 0 5px;
+  font-size: 16px;
+}
 .manage-customer input[type="text"],
 .manage-customer input[type="number"] {
   width: 100%;

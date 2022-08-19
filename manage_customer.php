@@ -67,7 +67,7 @@ function manageCustomer_statusSetting() {
 				<form class="form-status-customer">
 					<ul class="items">
 						<li class="item">
-							<input type="text" name="status-0" value="<?= getOptionStatusArr()[0] ?>">
+							<input placeholder="can't leave empty" type="text" name="status-0" value="<?= getOptionStatusArr()[0] ?>">
 							<button disabled type="button" class="default"><?= __('Item Default (only change text)') ?></button>
 						</li>
 						<?php $keyLast = 0; ?>
@@ -88,30 +88,36 @@ function manageCustomer_statusSetting() {
 		 	<script type="text/javascript">
 		 		var keyLast = parseInt('<?= $keyLast ?>');
 		 		var btnSave = jQuery('.status-section .form-status-customer .btn-save');
+		 		var inputDefault = jQuery('.form-status-customer [name="status-0"]');
 		 	    jQuery('.status-section .form-status-customer').on('submit', function(e) {
 		 	    	e.preventDefault();
 		 	    	btnSave.prop('disabled', true);
 		 	    	var thisForm = jQuery(this);
-		 	    	jQuery('.manage-customer div.box-loading').addClass( "loading" );
-		 	    	var formData = thisForm.serializeArray();
-		 	    	var url = '<?= admin_url( "admin-ajax.php" ) ?>';
-			        data = {
-	    		        'action': 'manageCustomer_saveListStatus',
-	    		        'data': formData
-			        };
-			        jQuery.post( url, data, function( json ) {
-						if (json.success) {
-							jQuery('.manage-customer .message').html(json.data.message);
-							jQuery('.manage-customer .message').addClass(json.data.status);
-							thisForm.find('.item').each(function() {
-								var valueItem = jQuery(this).find('input').val();
-								if (!valueItem) {
-									jQuery(this).remove();
-								}
-							});
-							jQuery('.manage-customer div.box-loading').removeClass( "loading" );
-						}
-		           	});
+		 	    	if (inputDefault.val()) {
+			 	    	jQuery('.manage-customer div.box-loading').addClass( "loading" );
+			 	    	var formData = thisForm.serializeArray();
+			 	    	var url = '<?= admin_url( "admin-ajax.php" ) ?>';
+				        data = {
+		    		        'action': 'manageCustomer_saveListStatus',
+		    		        'data': formData
+				        };
+				        jQuery.post( url, data, function( json ) {
+							if (json.success) {
+								jQuery('.manage-customer .message').html(json.data.message);
+								jQuery('.manage-customer .message').addClass(json.data.status);
+								thisForm.find('.item').each(function() {
+									var valueItem = jQuery(this).find('input').val();
+									if (!valueItem) {
+										jQuery(this).remove();
+									}
+								});
+								jQuery('.manage-customer div.box-loading').removeClass( "loading" );
+							}
+			           	});
+		 	    	} else {
+		 	    		jQuery('.manage-customer .message').html('<?= __('Please insert text for Item Default') ?>');
+		 	    		jQuery('.manage-customer .message').addClass('error');
+		 	    	}
 		 	    });
 		 	    jQuery('.status-section .form-status-customer .item input').on('input', function() {
 		 	    	btnSave.prop('disabled', false);

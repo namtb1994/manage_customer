@@ -253,16 +253,16 @@ function addCustomerFields() {
 }
 add_action( 'add_meta_boxes', 'addCustomerFields' );
 add_action( 'save_post', function( $post_id ) {
-    if ( isset( $_POST['customer_phone'] ) ) {
-        update_post_meta( $post_id, 'customer_phone', $_POST['customer_phone'] );
+    if ( isset( $_REQUEST['customer_phone'] ) ) {
+        update_post_meta( $post_id, 'customer_phone', $_REQUEST['customer_phone'] );
     }
-    if ( isset( $_POST['customer_status'] ) ) {
-        update_post_meta( $post_id, 'customer_status', $_POST['customer_status'] );
+    if ( isset( $_REQUEST['customer_status'] ) ) {
+        update_post_meta( $post_id, 'customer_status', $_REQUEST['customer_status'] );
     } else {
     	update_post_meta( $post_id, 'customer_status', getOptionStatusDefault() );
     }
-    if ( isset( $_POST['customer_id'] ) ) {
-        update_post_meta( $post_id, 'customer_id', $_POST['customer_id'] );
+    if ( isset( $_REQUEST['customer_id'] ) ) {
+        update_post_meta( $post_id, 'customer_id', $_REQUEST['customer_id'] );
     }
 });
 
@@ -405,8 +405,8 @@ function manageCustomer_importCustomer() {
 		'status' => 'updated',
 		'message' => __('Import success')
 	];
-	if ( isset( $_POST['data'] ) && !empty($_POST['data']) ) {
-		$rows = $_POST['data'];
+	if ( isset( $_REQUEST['data'] ) && !empty($_REQUEST['data']) ) {
+		$rows = $_REQUEST['data'];
 		foreach ($rows as $row) {
 			$customerData = [
 			  	'post_title'    => $row['name'],
@@ -687,20 +687,20 @@ function manageCustomer_savePost() {
 		'status_id' => null,
 		'count' => null
 	];
-	if ( isset( $_POST['data'] ) ) {
+	if ( isset( $_REQUEST['data'] ) ) {
 		$value = 0;
-		if ($_POST['data']['status']) {
-			$value = $_POST['data']['status'];
+		if ($_REQUEST['data']['status']) {
+			$value = $_REQUEST['data']['status'];
 		}
-        update_post_meta( $_POST['data']['id'], 'customer_status', $value );
+        update_post_meta( $_REQUEST['data']['id'], 'customer_status', $value );
         if ($value > 0) {
-        	$countStatus = get_post_meta($_POST['data']['id'], 'customer_status_'.$value, true);
+        	$countStatus = get_post_meta($_REQUEST['data']['id'], 'customer_status_'.$value, true);
         	if ($countStatus) {
         		$countStatus = (int)$countStatus + 1;
-        		update_post_meta( $_POST['data']['id'], 'customer_status_'.$value, $countStatus );
+        		update_post_meta( $_REQUEST['data']['id'], 'customer_status_'.$value, $countStatus );
         	} else {
         		$countStatus = 1;
-        		add_post_meta( $_POST['data']['id'], 'customer_status_'.$value, $countStatus );
+        		add_post_meta( $_REQUEST['data']['id'], 'customer_status_'.$value, $countStatus );
         	}
         	$result['status_id'] = $value;
         	$result['count'] = $countStatus;
@@ -721,13 +721,13 @@ function manageCustomer_createOrder() {
 		'message' => __('Created order success'),
 		'id' => null
 	];
-	if ( isset( $_POST['data'] ) ) {
+	if ( isset( $_REQUEST['data'] ) ) {
 		$content = '<h2>'.__("Info Customer").'</h2>';
-		$content .= '<p>'.$_POST['data']['info'].'</p>';
+		$content .= '<p>'.$_REQUEST['data']['info'].'</p>';
 		$content .= '<h2>'.__("Order List Note").'</h2>';
-		$content .= '<p>'.$_POST['data']['list_note'].'</p>';
+		$content .= '<p>'.$_REQUEST['data']['list_note'].'</p>';
 		$orderData = [
-		  	'post_title'    => 'Order for customer id: '.$_POST['data']['id'],
+		  	'post_title'    => 'Order for customer id: '.$_REQUEST['data']['id'],
 		  	'post_content'  => $content,
 		  	'post_type' => 'order',
 		  	'post_status' => 'publish'
@@ -738,7 +738,7 @@ function manageCustomer_createOrder() {
 			'post_title'   => '#'.$orderId
 	  	];
 		wp_update_post( $updateOrder );
-        update_post_meta( $orderId, 'customer_id', $_POST['data']['id'] );
+        update_post_meta( $orderId, 'customer_id', $_REQUEST['data']['id'] );
         $result['id'] = $orderId;
         $result['message'] = __('Created order: '.$updateOrder['post_title']);
     } else {
@@ -769,15 +769,15 @@ function manageCustomer_getListPost() {
 	$keyWord = null;
 	$status = null;
 	$author = null;
-	if (isset($_POST['data'])) {
-        $paged = $_POST['data']['page_load'];
-        $numberPostPerPage = $_POST['data']['posts_per_page'];
-        $orderby = $_POST['data']['orderby'];
-        $order = $_POST['data']['order'];
-        $totalRest = $_POST['data']['total_rest'];
-        $keyWord = $_POST['data']['key_word'];
-        $status = $_POST['data']['status'];
-        $author = $_POST['data']['author'];
+	if (isset($_REQUEST['data'])) {
+        $paged = $_REQUEST['data']['page_load'];
+        $numberPostPerPage = $_REQUEST['data']['posts_per_page'];
+        $orderby = $_REQUEST['data']['orderby'];
+        $order = $_REQUEST['data']['order'];
+        $totalRest = $_REQUEST['data']['total_rest'];
+        $keyWord = $_REQUEST['data']['key_word'];
+        $status = $_REQUEST['data']['status'];
+        $author = $_REQUEST['data']['author'];
     }
     $args = [
 		'paged' => $paged,

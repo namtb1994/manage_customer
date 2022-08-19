@@ -567,6 +567,11 @@ function manageCustomer_list() {
 					pagination.find('[name="current-page"]').attr('max', maxPage);
 					pagination.find('.max-page').html(maxPage);
 					pagination.find('.total-items').html(totalItems);
+					if (maxPage > 1) {
+						pagination.find('[name="current-page"]').prop('disabled', false);
+					} else {
+						pagination.find('[name="current-page"]').prop('disabled', true);
+					}
 					if (json.data.count) {
 						element.closest('table').find('thead').show();
 					} else {
@@ -596,7 +601,6 @@ function manageCustomer_list() {
 						inputKeyWord.prop('disabled', false);
 					}
 					submitSearch.prop('disabled', false);
-					pagination.find('[name="current-page"]').prop('disabled', false);
 				}
            	});
 		}

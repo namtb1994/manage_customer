@@ -172,12 +172,12 @@ function manageCustomer_saveListStatus() {
 add_action('wp_ajax_manageCustomer_saveListStatus', 'manageCustomer_saveListStatus');
 add_action('wp_ajax_nopriv_manageCustomer_saveListStatus', 'manageCustomer_saveListStatus');
 
-function loginRedirect( $redirect_to, $request, $user ){
+function loginRedirect( $redirect_to, $request, $user ) {
     return "/wp-admin/admin.php?page=manage_customer";
 }
 add_filter("login_redirect", "loginRedirect", 10, 3);
 
-function removeMenus(){  
+function removeMenus() {
 	remove_menu_page( 'index.php' );                  //Dashboard
 	remove_menu_page( 'edit.php' );                   //Posts
 	remove_menu_page( 'upload.php' );                 //Media

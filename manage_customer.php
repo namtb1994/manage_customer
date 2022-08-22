@@ -173,9 +173,15 @@ add_action('wp_ajax_manageCustomer_saveListStatus', 'manageCustomer_saveListStat
 add_action('wp_ajax_nopriv_manageCustomer_saveListStatus', 'manageCustomer_saveListStatus');
 
 function loginRedirect( $redirect_to, $request, $user ) {
-    return "/wp-admin/admin.php?page=manage_customer";
+    return admin_url( '/admin.php?page=manage_customer' );
 }
 add_filter("login_redirect", "loginRedirect", 10, 3);
+
+function dashboardRedirect() {
+	wp_redirect( admin_url( '/admin.php?page=manage_customer' ) );
+}
+add_action('wp_dashboard_setup', 'dashboardRedirect');
+
 
 function removeMenus() {
 	remove_menu_page( 'index.php' );                  //Dashboard
@@ -188,11 +194,11 @@ function removeMenus() {
 	remove_menu_page( 'options-general.php' );        //Settings
 	remove_menu_page( 'profile.php' );        		  //Profile
 	remove_menu_page( 'plugins.php' );                //Plugins
-	if( !current_user_can( 'administrator' ) ):
-        remove_menu_page( 'edit.php?post_type=customer' );
-        remove_menu_page( 'edit.php?post_type=order' );
-    endif;
-}  
+	if( !current_user_can( 'administrator' ) ) {
+		remove_menu_page( 'edit.php?post_type=customer' );
+		remove_menu_page( 'edit.php?post_type=order' );
+	}
+}
 add_action( 'admin_menu', 'removeMenus' );
 
 function createCustomerPostType() {

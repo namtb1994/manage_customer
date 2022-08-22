@@ -182,7 +182,6 @@ function dashboardRedirect() {
 }
 add_action('wp_dashboard_setup', 'dashboardRedirect');
 
-
 function removeMenus() {
 	remove_menu_page( 'index.php' );                  //Dashboard
 	remove_menu_page( 'edit.php' );                   //Posts

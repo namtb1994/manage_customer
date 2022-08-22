@@ -567,6 +567,7 @@ function manageCustomer_list() {
 					pagination.find('[name="current-page"]').attr('max', maxPage);
 					pagination.find('.max-page').html(maxPage);
 					pagination.find('.total-items').html(totalItems);
+					pagination.find('[name="current-page"]').val(parseInt(json.data.paged));
 					if (maxPage > 1) {
 						pagination.find('[name="current-page"]').prop('disabled', false);
 					} else {

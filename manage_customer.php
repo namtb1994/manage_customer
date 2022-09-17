@@ -248,6 +248,13 @@ function addCustomerFields() {
     );
 
     add_meta_box(
+        'customer_last_interact',
+        __( 'Customer Last Interact', 'customer_last_interact' ),
+        'customer_last_interact_callback',
+        'customer'
+    );
+
+    add_meta_box(
         'customer_status',
         __( 'Status', 'customer_status' ),
         'customer_status_callback',
@@ -266,6 +273,9 @@ add_action( 'save_post', function( $post_id ) {
     if ( isset( $_REQUEST['customer_phone'] ) ) {
         update_post_meta( $post_id, 'customer_phone', $_REQUEST['customer_phone'] );
     }
+    if ( isset( $_REQUEST['customer_last_interact'] ) ) {
+        update_post_meta( $post_id, 'customer_last_interact', $_REQUEST['customer_last_interact'] );
+    }
     if ( isset( $_REQUEST['customer_status'] ) ) {
         update_post_meta( $post_id, 'customer_status', $_REQUEST['customer_status'] );
     } else {
@@ -280,6 +290,13 @@ function customer_phone_callback( $post ) {
     $value = get_post_meta( $post->ID, 'customer_phone', true );
     ?>
     <input type="text" name="customer_phone" value="<?= esc_attr( $value ) ?>">
+    <?php
+}
+
+function customer_last_interact_callback( $post ) {
+    $value = get_post_meta( $post->ID, 'customer_last_interact', true );
+    ?>
+    <input type="text" name="customer_last_interact" value="<?= esc_attr( $value ) ?>">
     <?php
 }
 
@@ -346,10 +363,12 @@ function manageCustomer_backendOptions() {
 								workbook.SheetNames.forEach(function(sheetName) {
 									var XL_row_object = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
 									var json_object = JSON.stringify(XL_row_object);
+									json_object = JSON.parse(json_object);
+									console.log(json_object);
 									var url = '<?= admin_url( "admin-ajax.php" ) ?>';
 		    				        data = {
 		    		    		        'action': 'manageCustomer_importCustomer',
-		    		    		        'data': JSON.parse(json_object)
+		    		    		        'data': json_object
 		    				        };
 		    				        jQuery.post( url, data, function( json ) {
 		    							if (json.success) {
@@ -417,15 +436,27 @@ function manageCustomer_importCustomer() {
 	if ( isset( $_REQUEST['data'] ) && !empty($_REQUEST['data']) ) {
 		$rows = $_REQUEST['data'];
 		foreach ($rows as $row) {
-			$customerData = [
-			  	'post_title'    => $row['name'],
-			  	'post_content'  => $row['address'],
-			  	'post_type' => 'customer',
-			  	'post_status' => 'publish'
-			];
-			$customerId = wp_insert_post($customerData);
-	        update_post_meta( $customerId, 'customer_phone', $row['phone'] );
-	        update_post_meta( $customerId, 'customer_status', getOptionStatusDefault() );
+			if (isset($row['phone']) && isset($row['name'])) {
+				$customerData = [
+				  	'post_type' => 'customer',
+				  	'post_status' => 'publish',
+				  	'post_title' => $row['name']
+				];
+				if (isset($row['address'])) {
+					$customerData['post_content'] = $row['address'];
+				}
+				$customerId = wp_insert_post($customerData);
+				update_post_meta( $customerId, 'customer_phone', $row['phone'] );
+				update_post_meta( $customerId, 'customer_status', getOptionStatusDefault() );
+				if (isset($row['last_interact'])) {
+					$lastInteract = $row['last_interact'];
+					if (is_numeric($lastInteract)) {
+						$UNIX_DATE = ($lastInteract - 25569) * 86400;
+						$lastInteract = gmdate("d-m-Y", $UNIX_DATE);
+					}
+					update_post_meta( $customerId, 'customer_last_interact',  $lastInteract);
+				}
+			}
 		}
     } else {
     	$result['status'] = 'error';
@@ -506,6 +537,7 @@ function manageCustomer_list() {
 						<th><?= __('Name') ?></th>
 						<th><?= __('Phone Number') ?></th>
 						<th><?= __('Address') ?></th>
+						<th><?= __('Last interact') ?></th>
 						<th><?= __('Status') ?></th>
 						<?php foreach (getOptionStatusArr() as $key => $value): ?>
 							<?php if ($key > 0): ?>
@@ -869,6 +901,7 @@ function manageCustomer_getListPost() {
 			$html .= '<td><div class="name">'.get_the_title().'</div></td>';
 			$html .= '<td><div class="phone">'.get_post_meta($postId, 'customer_phone', true).'</div></td>';
 			$html .= '<td><div class="address">'.get_the_content().'</div></td>';
+			$html .= '<td><div class="last_interact">'.get_post_meta($postId, 'customer_last_interact', true).'</div></td>';
 			$html .= '<td><div>'.customer_status_callback($postId).'</div></td>';
 			foreach (getOptionStatusArr() as $key => $value) {
 				if ($key > 0) {

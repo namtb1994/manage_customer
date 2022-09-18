@@ -439,7 +439,7 @@ function manageCustomer_importCustomer() {
 			if (isset($row['phone']) && isset($row['name'])) {
 				$customerData = [
 				  	'post_type' => 'customer',
-				  	'post_status' => 'publish',
+				  	'post_status' => 'private',
 				  	'post_title' => $row['name']
 				];
 				if (isset($row['address'])) {
@@ -807,7 +807,7 @@ function manageCustomer_createOrder() {
 		  	'post_title'    => 'Order for customer id: '.$_REQUEST['data']['id'],
 		  	'post_content'  => $content,
 		  	'post_type' => 'order',
-		  	'post_status' => 'publish'
+		  	'post_status' => 'private'
 		];
 		$orderId = wp_insert_post($orderData);
 		$updateOrder = [
@@ -860,7 +860,6 @@ function manageCustomer_getListPost() {
 		'paged' => $paged,
 		'post_type' => 'customer',
 		'posts_per_page' => $numberPostPerPage,
-		'post_status' => 'publish',
 		'orderby' => $orderby,
 		'order' => $order
 	];

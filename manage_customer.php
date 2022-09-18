@@ -896,7 +896,7 @@ function manageCustomer_getListPost() {
 			$html .= '<tr class="item" data-id="'.$postId.'">';
 			$html .= '<td><div>'.$postId.'</div></td>';
 			if (current_user_can( 'administrator' )) {
-				$html .= '<td><div class="name">'.get_the_author().'</div></td>';
+				$html .= '<td><div class="staff_name">'.get_the_author().'</div></td>';
 			}
 			$html .= '<td><div class="name">'.get_the_title().'</div></td>';
 			$html .= '<td><div class="phone">'.get_post_meta($postId, 'customer_phone', true).'</div></td>';

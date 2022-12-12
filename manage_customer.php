@@ -192,7 +192,6 @@ function removeMenus() {
 	remove_menu_page( 'tools.php' );                  //Tools
 	remove_menu_page( 'options-general.php' );        //Settings
 	remove_menu_page( 'profile.php' );        		  //Profile
-	remove_menu_page( 'plugins.php' );                //Plugins
 	if( !current_user_can( 'administrator' ) ) {
 		remove_menu_page( 'edit.php?post_type=customer' );
 		remove_menu_page( 'edit.php?post_type=order' );
@@ -255,6 +254,20 @@ function addCustomerFields() {
     );
 
     add_meta_box(
+        'customer_gender',
+        __( 'Customer Gender', 'customer_gender' ),
+        'customer_gender_callback',
+        'customer'
+    );
+
+    add_meta_box(
+        'customer_source',
+        __( 'Customer Source', 'customer_source' ),
+        'customer_source_callback',
+        'customer'
+    );
+
+    add_meta_box(
         'customer_status',
         __( 'Status', 'customer_status' ),
         'customer_status_callback',
@@ -285,6 +298,20 @@ add_action( 'save_post', function( $post_id ) {
         update_post_meta( $post_id, 'customer_id', $_REQUEST['customer_id'] );
     }
 });
+
+function customer_source_callback( $post ) {
+    $value = get_post_meta( $post->ID, 'customer_source', true );
+    ?>
+    <input type="text" name="customer_source" value="<?= esc_attr( $value ) ?>">
+    <?php
+}
+
+function customer_gender_callback( $post ) {
+    $value = get_post_meta( $post->ID, 'customer_gender', true );
+    ?>
+    <input type="text" name="customer_gender" value="<?= esc_attr( $value ) ?>">
+    <?php
+}
 
 function customer_phone_callback( $post ) {
     $value = get_post_meta( $post->ID, 'customer_phone', true );
@@ -352,8 +379,32 @@ function manageCustomer_backendOptions() {
 					</form>
 				</div>
 			 	<script type="text/javascript">
+			 		var importPerTime = 100;
+			 		var dataCustomer;
+
+			 		function insertCustomer(dataCustomer) {
+			 			var url = '<?= admin_url( "admin-ajax.php" ) ?>';
+				        var data = {
+		    		        'action': 'manageCustomer_importCustomer',
+		    		        'data': dataCustomer.slice(0, importPerTime)
+				        };
+				        dataCustomer.splice(0, importPerTime);
+ 				        jQuery.post( url, data, function( json ) {
+ 							if (json.success) {
+ 								jQuery('.manage-customer .message').html(json.data.message);
+ 								jQuery('.manage-customer .message').addClass(json.data.status);
+ 								jQuery('.submit_search').trigger('click');
+ 								if (dataCustomer.slice(0, importPerTime).length) {
+ 									insertCustomer(dataCustomer);
+ 								} else {
+ 									jQuery('.manage-customer div.box-loading').removeClass( "loading" );
+ 								}
+ 							}
+ 			           	});
+			 		}
+
 			 		var ExcelToJSON = function() {
-						this.parseExcel = function(file) {
+		 				this.parseExcel = function(file) {
 							var reader = new FileReader();
 							reader.onload = function(e) {
 								var data = e.target.result;
@@ -363,22 +414,9 @@ function manageCustomer_backendOptions() {
 								workbook.SheetNames.forEach(function(sheetName) {
 									var XL_row_object = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
 									var json_object = JSON.stringify(XL_row_object);
-									json_object = JSON.parse(json_object);
-									console.log(json_object);
-									var url = '<?= admin_url( "admin-ajax.php" ) ?>';
-		    				        data = {
-		    		    		        'action': 'manageCustomer_importCustomer',
-		    		    		        'data': json_object
-		    				        };
-		    				        jQuery.post( url, data, function( json ) {
-		    							if (json.success) {
-		    								jQuery('.manage-customer .message').html(json.data.message);
-		    								jQuery('.manage-customer .message').addClass(json.data.status);
-		    								jQuery('.manage-customer div.box-loading').removeClass( "loading" );
-		    								jQuery('.submit_search').trigger('click');
-		    							}
-		    			           	});
-								})
+									dataCustomer = JSON.parse(json_object);
+									insertCustomer(dataCustomer);
+								});
 							};
 							reader.onerror = function(ex) {
 								console.log(ex);
@@ -386,6 +424,7 @@ function manageCustomer_backendOptions() {
 							reader.readAsBinaryString(file);
 						};
 					};
+
 			 	    jQuery('.import-section .form-import').on('submit', function(e) {
 			 	    	e.preventDefault();
 			        	const xlsFile = document.getElementById("list_customer_xls");
@@ -455,6 +494,12 @@ function manageCustomer_importCustomer() {
 						$lastInteract = gmdate("d-m-Y", $UNIX_DATE);
 					}
 					update_post_meta( $customerId, 'customer_last_interact',  $lastInteract);
+				}
+				if (isset($row['gender'])) {
+					update_post_meta( $customerId, 'customer_gender',  $row['gender']);
+				}
+				if (isset($row['source'])) {
+					update_post_meta( $customerId, 'customer_source',  $row['source']);
 				}
 			}
 		}
@@ -535,8 +580,10 @@ function manageCustomer_list() {
 							<th><?= __('Staff') ?></th>
 						<?php endif ?>
 						<th><?= __('Name') ?></th>
+						<th><?= __('Gender') ?></th>
 						<th><?= __('Phone Number') ?></th>
 						<th><?= __('Address') ?></th>
+						<th><?= __('Source') ?></th>
 						<th><?= __('Last interact') ?></th>
 						<th><?= __('Status') ?></th>
 						<?php foreach (getOptionStatusArr() as $key => $value): ?>
@@ -898,8 +945,10 @@ function manageCustomer_getListPost() {
 				$html .= '<td><div class="staff_name">'.get_the_author().'</div></td>';
 			}
 			$html .= '<td><div class="name">'.get_the_title().'</div></td>';
+			$html .= '<td><div class="customer_gender">'.get_post_meta($postId, 'customer_gender', true).'</div></td>';
 			$html .= '<td><div class="phone">'.get_post_meta($postId, 'customer_phone', true).'</div></td>';
 			$html .= '<td><div class="address">'.get_the_content().'</div></td>';
+			$html .= '<td><div class="customer_source">'.get_post_meta($postId, 'customer_source', true).'</div></td>';
 			$html .= '<td><div class="last_interact">'.get_post_meta($postId, 'customer_last_interact', true).'</div></td>';
 			$html .= '<td><div>'.customer_status_callback($postId).'</div></td>';
 			foreach (getOptionStatusArr() as $key => $value) {
